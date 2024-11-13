@@ -5,3 +5,7 @@
     font-size: 0.9rem;
 }
 
+.progress-bar {
+    transition: width 1s ease-in-out;
+}
+

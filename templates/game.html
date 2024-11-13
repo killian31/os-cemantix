@@ -21,21 +21,45 @@
         </div>
     </div>
     {% if message %}
-    <div class="alert {{ alert_class }}" role="alert">
-        {% if alert_class == 'alert-success' %}
-            <i class="fas fa-thumbs-up"></i>
-        {% elif alert_class == 'alert-secondary' %}
-            <i class="fas fa-info-circle"></i>
-        {% elif alert_class == 'alert-danger' %}
-            <i class="fas fa-exclamation-triangle"></i>
-        {% elif alert_class == 'alert-warning' %}
-            <i class="fas fa-exclamation-circle"></i>
+    <div class="alert {{ alert_class }} d-flex align-items-center" role="alert">
+        <div class="mr-3">
+            {% if alert_class == 'alert-success' %}
+                <i class="fas fa-thumbs-up"></i>&nbsp;
+            {% elif alert_class == 'alert-secondary' %}
+                <i class="fas fa-info-circle"></i>&nbsp;
+            {% elif alert_class == 'alert-danger' %}
+                <i class="fas fa-exclamation-triangle"></i>&nbsp;
+            {% elif alert_class == 'alert-warning' %}
+                <i class="fas fa-exclamation-circle"></i>&nbsp;
+            {% endif %}
+            {{ message }}
+        </div>
+        {% if progress_percent %}
+        <div class="progress flex-grow-1" style="height: 20px;">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              style="width: 0%;"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              id="similarityProgress"
+            ></div>
+        </div>
+        <script>
+            // Animer la barre de progression après le chargement de la page
+            document.addEventListener("DOMContentLoaded", function() {
+                let progressBar = document.getElementById('similarityProgress');
+                let progressPercent = {{ progress_percent }};
+                setTimeout(function() {
+                    progressBar.style.width = progressPercent + '%';
+                    progressBar.setAttribute('aria-valuenow', progressPercent);
+                }, 100); // Délai pour assurer que le DOM est prêt
+            });
+        </script>
         {% endif %}
-        &nbsp; <!-- Espace entre l'icône et le message -->
-        {{ message }}
     </div>
     {% endif %}
-
     <form method="post" class="mb-4">
         <div class="form-group">
             <label for="word">Entrez un mot :</label>

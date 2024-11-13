@@ -91,6 +91,12 @@ def index():
             session["target_word"] = get_target_word(mode)
             session["jokers"] = 100
             session["results"] = {}
+
+            # Calculer le max_similarity
+            most_similar = get_most_similar(session["target_word"])
+            max_similarity = most_similar[0][1]  # Score du mot le plus similaire
+            session["max_similarity"] = float(max_similarity)
+
             return redirect(url_for("game"))
         except Exception as e:
             print(f"Exception in index route: {e}")
@@ -106,9 +112,11 @@ def game():
     target_word = session["target_word"]
     jokers = session.get("jokers", 100)
     results = session.get("results", {})
+    max_similarity = session.get("max_similarity", 1.0)  # Valeur par défaut à 1.0
 
     message = ""
     alert_class = ""
+    progress_percent = None  # Initialiser à None
     sorted_results = []
     if request.method == "POST":
         word = request.form.get("word").strip()
@@ -149,12 +157,31 @@ def game():
                     return redirect(url_for("result", status="win"))
                 results[word] = float(similarity)
                 session["results"] = results
-                message = f"{word}: {similarity*100:.2f}"
-                # Définir la classe d'alerte en fonction du score
+
                 if similarity >= 0.25:
-                    alert_class = "alert-success"
+                    # Calculer le pourcentage de progression
+                    min_similarity = 0.25
+                    normalized_similarity = (similarity - min_similarity) / (
+                        max_similarity - min_similarity
+                    )
+                    progress_percent = (
+                        normalized_similarity * 99.8 + 0.1
+                    )  # Entre 0.1% et 99.9%
+                    progress_percent = max(
+                        0.1, min(progress_percent, 99.9)
+                    )  # S'assurer que c'est entre 0.1 et 99.9
+
+                    progress_percent = round(
+                        progress_percent, 2
+                    )  # Arrondir à 2 décimales
+
+                    message = f"{word}: {similarity*100:.2f}%"
+                    alert_class = "alert-secondary"  # Classe par défaut
                 else:
+                    # Similarité inférieure à 25%, pas d'animation
+                    message = f"{word}: {similarity*100:.2f}%"
                     alert_class = "alert-secondary"
+                    progress_percent = None  # Pas d'animation
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
     else:
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
@@ -165,6 +192,7 @@ def game():
         jokers=jokers,
         message=message,
         alert_class=alert_class,
+        progress_percent=progress_percent,
         results=sorted_results,
     )
 
