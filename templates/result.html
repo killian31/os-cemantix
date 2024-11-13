@@ -1,25 +1,34 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Open Source Cémantix - Résultats</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Résultat - Open Source Cémantix{% endblock %}
+
+{% block content %}
     {% if status == 'win' %}
-    <h1>Félicitations! Vous avez trouvé le mot!</h1>
+    <h1 class="my-4 text-center text-success">Félicitations ! Vous avez trouvé le mot !</h1>
     {% elif status == 'reveal' %}
-    <h1>Le mot à trouver était : {{ target_word }}</h1>
+    <h1 class="my-4 text-center">Le mot à trouver était : <strong>{{ target_word }}</strong></h1>
     {% elif status == 'quit' %}
-    <h1>Vous avez quitté le jeu.</h1>
+    <h1 class="my-4 text-center text-warning">Vous avez quitté le jeu.</h1>
     {% endif %}
     <h2>Les 100 mots les plus similaires étaient :</h2>
-    <ul>
-        {% for word, similarity in most_similar %}
-        <li>{{ word }}: {{ '%.2f'|format(similarity*100) }}</li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('index') }}">Rejouer</a>
-</body>
-</html>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Mot</th>
+                <th>Similarité (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for word, similarity in most_similar %}
+            <tr>
+                <td>{{ word }}</td>
+                <td>{{ '%.2f'|format(similarity*100) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center my-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Rejouer</a>
+    </div>
+{% endblock %}
 

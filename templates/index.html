@@ -1,23 +1,27 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Word Guessing Game - Accueil</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <h1>Open Source Cémantix</h1>
+{% extends "base.html" %}
+
+{% block title %}Accueil - Open Source Cémantix{% endblock %}
+
+{% block content %}
+    <h1 class="my-4 text-center">Bienvenue sur Open Source Cémantix</h1>
     {% if error %}
-    <p style="color:red;">{{ error }}</p>
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
     {% endif %}
     <form method="post">
-        <label for="mode">Sélectionnez le mode de jeu :</label><br>
-        <input type="radio" id="facile" name="mode" value="f" required>
-        <label for="facile">Facile (f)</label><br>
-        <input type="radio" id="difficile" name="mode" value="d">
-        <label for="difficile">Difficile (d)</label><br><br>
-        <input type="submit" value="Commencer le jeu">
+        <div class="form-group">
+            <label for="mode">Sélectionnez le mode de jeu :</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="facile" name="mode" value="f" required>
+                <label class="form-check-label" for="facile">Facile (f)</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="difficile" name="mode" value="d">
+                <label class="form-check-label" for="difficile">Difficile (d)</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Commencer le jeu</button>
     </form>
-</body>
-</html>
+{% endblock %}
 

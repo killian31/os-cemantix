@@ -1,0 +1,7 @@
+.table-sm tbody tr td,
+.table-sm tbody tr th {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    font-size: 0.9rem;
+}
+

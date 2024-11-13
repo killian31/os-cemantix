@@ -108,6 +108,7 @@ def game():
     results = session.get("results", {})
 
     message = ""
+    alert_class = ""
     sorted_results = []
     if request.method == "POST":
         word = request.form.get("word").strip()
@@ -116,6 +117,7 @@ def game():
         elif word == "5555":
             if jokers == 0:
                 message = "Vous n'avez plus de jokers :("
+                alert_class = "alert-warning"
             else:
                 most_similar = get_most_similar(target_word)
                 joker_index = jokers - 1
@@ -124,31 +126,46 @@ def game():
                     similarity = most_similar[joker_index][1]
                     jokers -= 1
                     session["jokers"] = jokers
-                    # Ajouter le mot indice aux résultats
                     results[hint_word] = float(similarity)
-                    session["results"] = results  # Mettre à jour la session
+                    session["results"] = results
                     message = f"{hint_word}: {similarity*100:.2f}"
+                    # Définir la classe d'alerte en fonction du score
+                    if similarity >= 0.25:
+                        alert_class = "alert-success"
+                    else:
+                        alert_class = "alert-secondary"
                 else:
                     message = "Plus de mots similaires disponibles."
+                    alert_class = "alert-warning"
         elif word == "9999":
             return redirect(url_for("result", status="reveal"))
         else:
             similarity = query(word, target_word)
             if similarity is None:
                 message = f"Je ne connais pas le mot {word}."
+                alert_class = "alert-danger"
             else:
                 if word == target_word:
                     return redirect(url_for("result", status="win"))
                 results[word] = float(similarity)
-                session["results"] = results  # Mettre à jour la session
+                session["results"] = results
                 message = f"{word}: {similarity*100:.2f}"
-        # Trier les résultats
+                # Définir la classe d'alerte en fonction du score
+                if similarity >= 0.25:
+                    alert_class = "alert-success"
+                else:
+                    alert_class = "alert-secondary"
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
     else:
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
+        alert_class = ""
 
     return render_template(
-        "game.html", jokers=jokers, message=message, results=sorted_results
+        "game.html",
+        jokers=jokers,
+        message=message,
+        alert_class=alert_class,
+        results=sorted_results,
     )
 
 
