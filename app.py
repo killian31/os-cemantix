@@ -7,8 +7,6 @@ from gensim.models import KeyedVectors
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Model and cleaned_key_map will be loaded when the application starts
-MODEL_PATH = "models/frWac_no_postag_no_phrase_700_skip_cut50.bin"
 
 # Initialize model and cleaned_key_map as None
 model = None
@@ -145,6 +143,7 @@ def game():
                 else:
                     message = "Plus de mots similaires disponibles."
                     alert_class = "alert-warning"
+            progress_value = None  # Pas de barre de progression pour les indices
         elif word == "9999":
             return redirect(url_for("result", status="reveal"))
         else:
@@ -152,47 +151,47 @@ def game():
             if similarity is None:
                 message = f"Je ne connais pas le mot {word}."
                 alert_class = "alert-danger"
+                similarity_percentage = None  # Pas de similarité disponible
+                progress_value = None  # Pas de barre de progression
             else:
                 if word == target_word:
                     return redirect(url_for("result", status="win"))
                 results[word] = float(similarity)
                 session["results"] = results
 
-                if similarity >= 0.25:
-                    # Calculer le pourcentage de progression
+                similarity_percentage = similarity * 100  # Similarité en pourcentage
+                message = f"{word}: {similarity_percentage:.2f}%"
+                alert_class = "alert-secondary"
+
+                if similarity >= 0.25 and similarity <= max_similarity:
                     min_similarity = 0.25
-                    normalized_similarity = (similarity - min_similarity) / (
-                        max_similarity - min_similarity
-                    )
-                    progress_percent = (
-                        normalized_similarity * 99.8 + 0.1
-                    )  # Entre 0.1% et 99.9%
-                    progress_percent = max(
-                        0.1, min(progress_percent, 99.9)
-                    )  # S'assurer que c'est entre 0.1 et 99.9
-
-                    progress_percent = round(
-                        progress_percent, 2
-                    )  # Arrondir à 2 décimales
-
-                    message = f"{word}: {similarity*100:.2f}%"
-                    alert_class = "alert-secondary"  # Classe par défaut
+                    if max_similarity > min_similarity:
+                        normalized_similarity = (similarity - min_similarity) / (
+                            max_similarity - min_similarity
+                        )
+                        progress_value = (
+                            normalized_similarity * 998 + 1
+                        )  # Valeur entre 1 et 999
+                        progress_value = max(
+                            1, min(progress_value, 999)
+                        )  # S'assurer que la valeur est entre 1 et 999
+                        progress_value = round(progress_value, 2)
+                    else:
+                        progress_value = 999  # Si max_similarity == min_similarity
                 else:
-                    # Similarité inférieure à 25%, pas d'animation
-                    message = f"{word}: {similarity*100:.2f}%"
-                    alert_class = "alert-secondary"
-                    progress_percent = None  # Pas d'animation
+                    progress_value = None  # Pas de barre si similarité < 25%
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
     else:
         sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
         alert_class = ""
+        progress_value = None
 
     return render_template(
         "game.html",
         jokers=jokers,
         message=message,
         alert_class=alert_class,
-        progress_percent=progress_percent,
+        progress_value=progress_value,
         results=sorted_results,
     )
 

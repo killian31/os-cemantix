@@ -34,7 +34,7 @@
             {% endif %}
             {{ message }}
         </div>
-        {% if progress_percent %}
+        {% if progress_value %}
         <div class="progress flex-grow-1" style="height: 20px;">
             <div
               class="progress-bar"
@@ -44,17 +44,19 @@
               aria-valuemin="0"
               aria-valuemax="100"
               id="similarityProgress"
-            ></div>
+            >
+                <!-- Le texte sera mis à jour via JavaScript -->
+            </div>
         </div>
         <script>
-            // Animer la barre de progression après le chargement de la page
             document.addEventListener("DOMContentLoaded", function() {
                 let progressBar = document.getElementById('similarityProgress');
-                let progressPercent = {{ progress_percent }};
+                let progressPercent = {{ progress_value }} / 10; // Convertir ‰ en %
                 setTimeout(function() {
                     progressBar.style.width = progressPercent + '%';
                     progressBar.setAttribute('aria-valuenow', progressPercent);
-                }, 100); // Délai pour assurer que le DOM est prêt
+                    progressBar.innerText = '{{ progress_value }}'; // Affiche la valeur en ‰
+                }, 100);
             });
         </script>
         {% endif %}
