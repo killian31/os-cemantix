@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Open Source Cémantix - Résultats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% if status == 'win' %}
+    <h1>Félicitations! Vous avez trouvé le mot!</h1>
+    {% elif status == 'reveal' %}
+    <h1>Le mot à trouver était : {{ target_word }}</h1>
+    {% elif status == 'quit' %}
+    <h1>Vous avez quitté le jeu.</h1>
+    {% endif %}
+    <h2>Les 100 mots les plus similaires étaient :</h2>
+    <ul>
+        {% for word, similarity in most_similar %}
+        <li>{{ word }}: {{ '%.2f'|format(similarity*100) }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}">Rejouer</a>
+</body>
+</html>
+

@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "os-cemantix"
+version = "0.1.0"
+description = "Open-source version of the cemantix game by enigmatix"
+authors = ["killian31 <80256683+killian31@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+gensim = "^4.3.3"
+flask = "^3.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
