@@ -81,7 +81,10 @@ def get_most_similar(target_word):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if model is None:
-        return "Error: Model not loaded.", 500
+        return (
+            f"Error: Model not loaded. Path is {MODEL_PATH}. Current dir contains:\n{os.listdir('.')}",
+            500,
+        )
     if request.method == "POST":
         mode = request.form.get("mode")
         if mode not in ["f", "d"]:
