@@ -4,10 +4,9 @@ version = "0.1.0"
 description = "Open-source version of the cemantix game by enigmatix"
 authors = ["killian31 <80256683+killian31@users.noreply.github.com>"]
 readme = "README.md"
-package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 gensim = "^4.3.3"
 flask = "^3.1.0"
 requests = "^2.32.3"
