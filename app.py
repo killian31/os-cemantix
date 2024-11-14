@@ -119,7 +119,6 @@ def game():
 
     message = ""
     alert_class = ""
-    progress_percent = None  # Initialiser à None
     sorted_results = []
     if request.method == "POST":
         word = request.form.get("word").strip()
@@ -227,8 +226,5 @@ if __name__ == "__main__":
         model = None
     print("Creating cleaned key map...")
     cleaned_key_map = create_cleaned_key_map()
-    print(f"Model is: {model}")
-    print(f"Model key_to_index is: {model.key_to_index}")
-
     print("Resources loaded successfully.")
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=8000, debug=True)
