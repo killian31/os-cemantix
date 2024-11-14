@@ -80,6 +80,8 @@ def get_most_similar(target_word):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    if model is None:
+        return "Error: Model not loaded.", 500
     if request.method == "POST":
         mode = request.form.get("mode")
         if mode not in ["f", "d"]:
@@ -215,8 +217,15 @@ if __name__ == "__main__":
             f"wget https://embeddings.net/embeddings/frWac_no_postag_no_phrase_700_skip_cut50.bin -P models/ --quiet"
         )
     print("Loading the model...")
-    model = load_model(MODEL_PATH)
+    try:
+        model = load_model(MODEL_PATH)
+    except Exception as e:
+        print(f"Error loading model: {e}")
+        model = None
     print("Creating cleaned key map...")
     cleaned_key_map = create_cleaned_key_map()
+    print(f"Model is: {model}")
+    print(f"Model key_to_index is: {model.key_to_index}")
+
     print("Resources loaded successfully.")
     app.run(host="0.0.0.0", port=8000)
