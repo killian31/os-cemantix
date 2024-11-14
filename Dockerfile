@@ -25,6 +25,9 @@ RUN poetry config virtualenvs.in-project true
 # Install project dependencies
 RUN poetry install --no-root --no-interaction --no-ansi
 
+# Ensure the virtual environment's bin directory is in PATH
+ENV PATH="/app/.venv/bin:$PATH"
+
 # Copy the rest of the application code
 COPY . .
 
@@ -36,5 +39,5 @@ ENV PORT=8000
 ENV PYTHONUNBUFFERED=1
 
 # Set the entrypoint to run the application with Gunicorn
-CMD ["poetry", "run", "gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
 
