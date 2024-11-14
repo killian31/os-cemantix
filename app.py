@@ -219,4 +219,4 @@ if __name__ == "__main__":
     print("Creating cleaned key map...")
     cleaned_key_map = create_cleaned_key_map()
     print("Resources loaded successfully.")
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8000)
