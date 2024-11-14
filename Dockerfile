@@ -31,24 +31,11 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Copy the rest of the application code
 COPY . .
 
-# Download the model file during the build process
-# Ensure that the model URL is accessible during the build
-RUN poetry run python -c "\
-import os; \
-import requests; \
-MODEL_URL = 'https://embeddings.net/embeddings/frWac_no_postag_no_phrase_700_skip_cut50.bin'; \
-MODEL_PATH = 'models/frWac_no_postag_no_phrase_700_skip_cut50.bin'; \
-if not os.path.exists(MODEL_PATH): \
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True); \
-    print('Downloading the model...'); \
-    response = requests.get(MODEL_URL, stream=True); \
-    with open(MODEL_PATH, 'wb') as f: \
-        for chunk in response.iter_content(chunk_size=8192): \
-            if chunk: \
-                f.write(chunk); \
-    print('Model downloaded.'); \
-else: \
-    print('Model already exists.');"
+# Copy the model download script
+COPY download_model.py .
+
+# Run the model download script
+RUN poetry run python download_model.py
 
 # Expose the port that the app runs on
 EXPOSE 8000
