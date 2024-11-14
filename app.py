@@ -8,21 +8,24 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 
-# Initialize model and cleaned_key_map as None
-model = None
-cleaned_key_map = None
+MODEL_PATH = "models/frWac_no_postag_no_phrase_700_skip_cut50.bin"
 
 
 def load_model(path):
     return KeyedVectors.load_word2vec_format(path, binary=True, unicode_errors="ignore")
 
 
-def query(word, target_word):
-    original_key = cleaned_key_map.get(word)
-    if original_key is None:
-        return None
-    original_target_key = cleaned_key_map.get(target_word)
-    return model.similarity(original_key, original_target_key)
+if not os.path.isfile(MODEL_PATH):
+    os.makedirs("models", exist_ok=True)
+    os.system(
+        f"wget https://embeddings.net/embeddings/frWac_no_postag_no_phrase_700_skip_cut50.bin -P models/ --quiet"
+    )
+print("Loading the model...")
+try:
+    model = load_model(MODEL_PATH)
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
 
 def create_cleaned_key_map():
@@ -36,6 +39,17 @@ def create_cleaned_key_map():
         key: value for key, value in cleaned_key_map.items() if "'" not in key
     }
     return cleaned_key_map
+
+
+cleaned_key_map = create_cleaned_key_map()
+
+
+def query(word, target_word):
+    original_key = cleaned_key_map.get(word)
+    if original_key is None:
+        return None
+    original_target_key = cleaned_key_map.get(target_word)
+    return model.similarity(original_key, original_target_key)
 
 
 def get_interest_words(difficulty="d"):
@@ -81,10 +95,7 @@ def get_most_similar(target_word):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if model is None:
-        return (
-            f"Error: Model not loaded. Path is {MODEL_PATH}. Current dir contains:\n{os.listdir('.')}",
-            500,
-        )
+        return "Error: Model not loaded.", 500
     if request.method == "POST":
         mode = request.form.get("mode")
         if mode not in ["f", "d"]:
@@ -211,20 +222,4 @@ def result(status):
 
 
 if __name__ == "__main__":
-    # Load resources when the application starts
-    MODEL_PATH = "models/frWac_no_postag_no_phrase_700_skip_cut50.bin"
-    if not os.path.isfile(MODEL_PATH):
-        os.makedirs("models", exist_ok=True)
-        os.system(
-            f"wget https://embeddings.net/embeddings/frWac_no_postag_no_phrase_700_skip_cut50.bin -P models/ --quiet"
-        )
-    print("Loading the model...")
-    try:
-        model = load_model(MODEL_PATH)
-    except Exception as e:
-        print(f"Error loading model: {e}")
-        model = None
-    print("Creating cleaned key map...")
-    cleaned_key_map = create_cleaned_key_map()
-    print("Resources loaded successfully.")
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8000)
